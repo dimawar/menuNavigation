@@ -16,4 +16,5 @@
     "autoload": {
         "psr-0": { "Prime\\NavigationBundle": "" }
     },
+    "target-dir": "Prime/NavigationBundle",
 }
