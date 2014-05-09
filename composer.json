@@ -1,0 +1,14 @@
+{
+    "name": "prime/navigation-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "leviothan",
+            "email": "leviothano@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "rybakit/navigation-bundle": "dev-master"
+    }
+}
