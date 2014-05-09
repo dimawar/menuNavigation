@@ -1,6 +1,6 @@
 # PrimeNavigationBundle
 
-## Install
+### Install
 
 Add PrimeNavigationBundle to your composer.json
 
