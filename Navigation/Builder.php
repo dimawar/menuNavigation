@@ -45,30 +45,36 @@ class Builder
         $item->transDomain = 'navigation';
         $factory = new ItemFactory($filter, $item);
 
-        list($bundleName, $className, $methodName) = explode(':', $navigation);
+        $classData = explode(':', $navigation);
 
-        $class = null;
+        if (sizeof($classData) != 1) {
+            list($bundleName, $className, $methodName) = $classData;
 
-        foreach ($this->kernel->getBundle($bundleName, false) as $bundle) {
-            $try = $bundle->getNamespace().'\\Navigation\\'.$className;
-            if (class_exists($try)) {
-                $class = $try;
-                break;
+            $class = null;
+
+            foreach ($this->kernel->getBundle($bundleName, false) as $bundle) {
+                $try = $bundle->getNamespace().'\\Navigation\\'.$className;
+                if (class_exists($try)) {
+                    $class = $try;
+                    break;
+                }
             }
 
-//            $logs[] = sprintf('Class "%s" does not exist for menu builder "%s".', $try, $name);
-//            $bundles[] = $bundle->getName();
+            $builder = new $class;
+
+            if (!method_exists($builder, $methodName)) {
+                throw new \Exception('Class not found');
+            }
+
+            $navigationTree = $builder->$methodName();
+        } else {
+            $navigationTree = $this->container->get($navigation);
+
+            if (!$navigationTree) {
+                throw new \Exception('Menu not found');
+            }
         }
 
-        $builder = new $class;
-
-        if (!method_exists($builder, $methodName)) {
-            throw new \Exception('Class not found');
-        }
-
-
-
-        $navigationTree = $builder->$methodName();
 
         $root = $factory->create($navigationTree);
 
