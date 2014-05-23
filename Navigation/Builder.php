@@ -47,7 +47,7 @@ class Builder
 
         $classData = explode(':', $navigation);
 
-        if (sizeof($classData) != 1) {
+        if (sizeof($classData) != 2) {
             list($bundleName, $className, $methodName) = $classData;
 
             $class = null;
@@ -60,21 +60,21 @@ class Builder
                 }
             }
 
-            $builder = new $class;
-
-            if (!method_exists($builder, $methodName)) {
-                throw new \Exception('Class not found');
-            }
-
-            $navigationTree = $builder->$methodName();
+            $builder = new $class;            
         } else {
-            $navigationTree = $this->container->get($navigation);
+            list($service, $methodName) = $classData;
 
-            if (!$navigationTree) {
-                throw new \Exception('Menu not found');
+            $builder = $this->container->get($service);
+            if (!$builder) {
+                throw new \Exception('Service not found');
             }
         }
 
+        if (!method_exists($builder, $methodName)) {
+            throw new \Exception('Class not found');
+        }
+
+        $navigationTree = $builder->$methodName();
 
         $root = $factory->create($navigationTree);
 
