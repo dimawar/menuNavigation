@@ -86,7 +86,7 @@ class NavigationExtension extends \Twig_Extension
         }
 
         $template = $this->environment->loadTemplate($templatePath);
-        $iterator = new RecursiveTreeIterator($navigation['root']);
+        $iterator = new BreadcrumbIterator($navigation['root']);
 
         return $template->renderBlock('breadcrumbs', array(
             'items' => $iterator,
