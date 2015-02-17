@@ -1,5 +1,6 @@
 {
     "name": "prime/navigation-bundle",
+    "description": "Simple menu bundle for Symfony2",
     "license": "MIT",
     "authors": [
         {
