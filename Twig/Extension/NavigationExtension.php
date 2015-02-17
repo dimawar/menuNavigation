@@ -53,6 +53,7 @@ class NavigationExtension extends \Twig_Extension
     {
         return array(
             'prime_navigation' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
+            'prime_navigation_breadcrumbs' => new \Twig_Function_Method($this, 'renderBreadcrumbs', array('is_safe' => array('html'))),
         );
     }
 
@@ -69,11 +70,25 @@ class NavigationExtension extends \Twig_Extension
 
         $iterator = new RecursiveTreeIterator($navigation['root']);
 
-//        if (null !== $depth) {
-//            $iterator->setMaxLevel((int) $depth - 1);
-//        }
-
         return $template->renderBlock('navlist', array(
+            'items' => $iterator,
+        ));
+    }
+
+    public function renderBreadcrumbs($menu, array $options = array())
+    {
+        $navigation = $this->builder->build($menu);
+
+        if (!$options['template']) {
+            $templatePath = $this->defaultTemplate;
+        } else {
+            $templatePath = $options['template'];
+        }
+
+        $template = $this->environment->loadTemplate($templatePath);
+        $iterator = new RecursiveTreeIterator($navigation['root']);
+
+        return $template->renderBlock('breadcrumbs', array(
             'items' => $iterator,
         ));
     }
