@@ -9,6 +9,7 @@
 namespace Prime\NavigationBundle\Twig\Extension;
 
 use Rybakit\Bundle\NavigationBundle\Navigation\Iterator\RecursiveTreeIterator;
+use Rybakit\Bundle\NavigationBundle\Navigation\Iterator\BreadcrumbIterator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class NavigationExtension extends \Twig_Extension
