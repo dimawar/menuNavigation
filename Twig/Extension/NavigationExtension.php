@@ -87,7 +87,7 @@ class NavigationExtension extends \Twig_Extension
         }
 
         $template = $this->environment->loadTemplate($templatePath);
-        $iterator = new BreadcrumbIterator($navigation['root']);
+        $iterator = new BreadcrumbIterator($navigation['current']);
 
         return $template->renderBlock('breadcrumbs', array(
             'items' => $iterator,
