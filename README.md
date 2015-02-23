@@ -7,7 +7,7 @@ Add PrimeNavigationBundle to your composer.json
 ```
 "require": {
     "rybakit/navigation-bundle": "dev-master",
-    "prime/navigation-bundle": "dev-master"
+    "prime/navigation-bundle": "v1.0"
 }
 ```
 
