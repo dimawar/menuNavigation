@@ -6,7 +6,7 @@ Add PrimeNavigationBundle to your composer.json
 
 ```
 "require": {
-    "prime/navigation-bundle": "v2.0-beta"
+    "prime/navigation-bundle": "dev-v2.0-beta"
 }
 ```
 
