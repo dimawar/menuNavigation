@@ -1,0 +1,17 @@
+{% extends "PrimeNavigationBundle:Navigation:base.html.twig" %}
+
+{% block root %}
+    <ul>
+        {{ block('list_items') }}
+    </ul>
+{% endblock %}
+
+{% block list_items %}
+    {% for page in breadcrumbs %}
+    <li>
+        <a href="{{ page.href }}">
+            {{ page.label }}
+        </a>
+    </li>
+    {% endfor %}
+{% endblock %}

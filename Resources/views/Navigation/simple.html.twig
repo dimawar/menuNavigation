@@ -1,0 +1,23 @@
+{% extends "PrimeNavigationBundle:Navigation:base.html.twig" %}
+
+{% block root %}
+    {#{% set page = navigation.pages %}#}
+    {{ block('list') }}
+{% endblock %}
+
+{% block list %}
+    <ul>
+        {% for child in navigation %}
+            <li {% if child.active %}class="active"{% endif %}>
+                <a href="{{ child.href }}">
+                    {{ child.label|trans({}, 'navigation') }}
+                </a>
+
+                {% if child.hasPages() %}
+                    {% set page = child.pages %}
+                    {{ block('list') }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,6 +1,6 @@
 {
     "name": "prime/navigation-bundle",
-    "description": "Simple menu bundle for Symfony2",
+    "description": "Navigation bundle for Symfony2",
     "license": "MIT",
     "authors": [
         {
@@ -11,8 +11,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.2",
-        "symfony/framework-bundle": "~2.1",
-        "rybakit/navigation-bundle": "dev-master"
+        "symfony/framework-bundle": "~2.1"
     },
     "autoload": {
         "psr-0": { "Prime\\NavigationBundle": "" }

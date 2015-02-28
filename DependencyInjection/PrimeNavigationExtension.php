@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\Loader;
 class PrimeNavigationExtension extends Extension
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -25,6 +25,6 @@ class PrimeNavigationExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('prime_navigation.template', $config['template']);
+        $container->setParameter('prime_navigation', $config);
     }
 }

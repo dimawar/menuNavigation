@@ -2,32 +2,35 @@
 /**
  * Created by PhpStorm.
  * User: leviothan
- * Date: 06/11/13
- * Time: 12:30
+ * Date: 23.02.15
+ * Time: 17:26
  */
-
 namespace Prime\NavigationBundle\Twig\Extension;
 
-use Rybakit\Bundle\NavigationBundle\Navigation\Iterator\RecursiveTreeIterator;
-use Rybakit\Bundle\NavigationBundle\Navigation\Iterator\BreadcrumbIterator;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Prime\NavigationBundle\Navigation\Builder;
+use Prime\NavigationBundle\Navigation\Page\Page;
 
 class NavigationExtension extends \Twig_Extension
 {
+    /** @var Builder */
+    protected $builder;
+
+    protected $config;
 
     /**
      * @var \Twig_Environment
      */
     protected $environment;
 
-    private $builder;
-    private $defaultTemplate;
-
-
-    function __construct($builder, $template)
+    public function __construct(Builder $builder, $config)
     {
         $this->builder = $builder;
-        $this->defaultTemplate = $template;
+        $this->config = $config;
+    }
+
+    public function getName()
+    {
+        return 'prime_navigation';
     }
 
     /**
@@ -38,59 +41,91 @@ class NavigationExtension extends \Twig_Extension
         $this->environment = $environment;
     }
 
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
-     */
-    public function getName()
-    {
-        return 'prime_navigation';
-    }
-
-
     public function getFunctions()
     {
         return array(
-            'prime_navigation' => new \Twig_Function_Method($this, 'render', array('is_safe' => array('html'))),
-            'prime_navigation_breadcrumbs' => new \Twig_Function_Method($this, 'renderBreadcrumbs', array('is_safe' => array('html'))),
+            'navigation' => new \Twig_Function_Method($this, 'navigation', array('is_safe' => array('html'))),
+            'navigation_breadcrumbs' => new \Twig_Function_Method($this, 'breadcrumbs', array(
+                'is_safe' => array('html')
+            )),
         );
     }
 
-    public function render($menu, $templatePath = null)
+    public function navigation($alias, $options = null)
     {
+        $navigation = $this->builder->buildFromAlias($alias);
 
-        $navigation = $this->builder->build($menu);
-
-        if (!$templatePath) {
-            $templatePath = $this->defaultTemplate;
+        $template = $this->config['template'];
+        if (!empty($options['template'])) {
+            $template = $options['template'];
         }
 
-        $template = $this->environment->loadTemplate($templatePath);
-
-        $iterator = new RecursiveTreeIterator($navigation['root']);
-
-        return $template->renderBlock('navlist', array(
-            'items' => $iterator,
+        return $this->environment->render($template, array(
+            'navigation' => $navigation
         ));
     }
 
-    public function renderBreadcrumbs($menu, array $options = array())
+    public function breadcrumbs($alias, $options = null)
     {
-        $navigation = $this->builder->build($menu);
-
-        if (!$options['template']) {
-            $templatePath = $this->defaultTemplate;
-        } else {
-            $templatePath = $options['template'];
+        $navigation = $this->builder->buildFromAlias($alias);
+        $template = $this->config['breadcrumbs_template'];
+        if (!empty($options['template'])) {
+            $template = $options['template'];
         }
 
-        $template = $this->environment->loadTemplate($templatePath);
-        $iterator = new BreadcrumbIterator($navigation['current']);
+        $found  = null;
+        $foundDepth = -1;
 
-        return $template->renderBlock('breadcrumbs', array(
-            'items' => $iterator,
+        $minDepth = 0;
+        $maxDepth = null;
+
+        $iterator = new \RecursiveIteratorIterator($navigation, \RecursiveIteratorIterator::CHILD_FIRST);
+        $breadcrumbs = array();
+
+        foreach ($iterator as $page) {
+            $currDepth = $iterator->getDepth();
+            if ($currDepth < $minDepth) {
+                // page is not accepted
+                continue;
+            }
+            if ($page->isActive(false) && $currDepth > $foundDepth) {
+                // found an active page at a deeper level than before
+                $found = $page;
+                $foundDepth = $currDepth;
+            }
+        }
+
+        if (is_int($maxDepth) && $foundDepth > $maxDepth) {
+            while ($foundDepth > $maxDepth) {
+                if (--$foundDepth < $minDepth) {
+                    $found = null;
+                    break;
+                }
+                $found = $found->getParent();
+                if (!$found instanceof Page) {
+                    $found = null;
+                    break;
+                }
+            }
+        }
+
+        if ($found) {
+            $breadcrumbs[] = $found;
+
+            $active = $found;
+
+            while ($parent = $active->getParent()) {
+                if ($parent == $navigation) {
+                    break;
+                }
+
+                $breadcrumbs[] = $parent;
+                $active = $parent;
+            }
+        }
+
+        return $this->environment->render($template, array(
+            'breadcrumbs' => array_reverse($breadcrumbs)
         ));
     }
 }
