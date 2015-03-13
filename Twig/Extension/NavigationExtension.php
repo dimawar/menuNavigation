@@ -80,7 +80,7 @@ class NavigationExtension extends \Twig_Extension
     {
         $navigation = $this->builder->build($menu);
 
-        if (!$options['template']) {
+        if (!isset($options['template'])) {
             $templatePath = $this->defaultTemplate;
         } else {
             $templatePath = $options['template'];
