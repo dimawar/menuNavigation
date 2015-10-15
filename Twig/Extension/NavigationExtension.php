@@ -44,8 +44,8 @@ class NavigationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'navigation' => new \Twig_Function_Method($this, 'navigation', array('is_safe' => array('html'))),
-            'navigation_breadcrumbs' => new \Twig_Function_Method($this, 'breadcrumbs', array(
+            'navigation' => new \Twig_SimpleFunction($this, 'navigation', array('is_safe' => array('html'))),
+            'navigation_breadcrumbs' => new \Twig_SimpleFunction($this, 'breadcrumbs', array(
                 'is_safe' => array('html')
             )),
         );
