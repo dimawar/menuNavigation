@@ -232,6 +232,14 @@ class Page extends Navigation
     }
 
     /**
+     * @param bool $visible
+     */
+    public function setVisible($visible)
+    {
+        $this->visible = $visible;
+    }
+
+    /**
      * @return null|string
      */
     public function getFragment()
