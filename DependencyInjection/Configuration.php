@@ -13,7 +13,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
     {
@@ -22,8 +22,13 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('template')->defaultValue('PrimeNavigationBundle::bs3.html.twig')
-            ->end()
+                ->scalarNode('template')
+                    ->defaultValue('PrimeNavigationBundle:Navigation:simple.html.twig')
+                ->end()
+                ->scalarNode('breadcrumbs_template')
+                    ->defaultValue('PrimeNavigationBundle:Navigation:breadcrumbs.html.twig')
+                ->end()
+            ->end();
         ;
 
         return $treeBuilder;

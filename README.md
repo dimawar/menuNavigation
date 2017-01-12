@@ -6,8 +6,7 @@ Add PrimeNavigationBundle to your composer.json
 
 ```
 "require": {
-    "rybakit/navigation-bundle": "dev-master",
-    "prime/navigation-bundle": "v1.0"
+    "prime/navigation-bundle": "dev-v2.0-beta"
 }
 ```
 
@@ -33,34 +32,36 @@ public function registerBundles()
 ``` php
 
 <?php
-// src/Acme/SampleBundle/Navigation/Builder.php
+// src/AppBundle/Navigation/MainNavigation.php
 
-namespace Acme\SampleBundle\Navigation;
+namespace AppBundleBundle\Navigation;
 
 
-class Builder 
+class MainNavigation
 {
 
-    public function mainNav()
+    public function build()
     {
         return array(
-            'label' => 'Root',
-            'children' => array(
-                array(
-                    'label' => 'Homepage',
-                    'route' => 'route_homepage'
-                ),
-            )
+            array(
+                'label' => 'Page #1',
+                'route' => 'route_homepage'
+            ),
+            array(
+                'label' => 'Page #2',
+                'route' => 'route_page',
+                'routeParameters => array('slug' => 'page_2')
+            ),
         );
     }
-} 
+}
 
 ```
 
 ### Render navigation
 
 ```
-{{ prime_navigation('AcmeSampleBundle:Builder:mainNav') }}
+{{ navigation('AppBundle:Navigation:Main') }}
 ```
 
 ### Configuration
@@ -69,5 +70,6 @@ class Builder
 // app/config.yml
 
 prime_navigation:
-    template: 'PrimeNavigationBundle::bs3.html.twig'
+    template: 'PrimeNavigationBundle:Navigation:simple.html.twig'
+    breadcrumbs_template: 'PrimeNavigationBundle:Navigation:breadcrumbs.html.twig'
 ```

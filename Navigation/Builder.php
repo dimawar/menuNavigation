@@ -2,87 +2,63 @@
 /**
  * Created by PhpStorm.
  * User: leviothan
- * Date: 09/05/14
- * Time: 16:20
+ * Date: 23.02.15
+ * Time: 20:12
  */
-
 namespace Prime\NavigationBundle\Navigation;
 
-use Rybakit\Bundle\NavigationBundle\Navigation\Filter\BindFilter;
-use Rybakit\Bundle\NavigationBundle\Navigation\Filter\FilterChain;
-use Rybakit\Bundle\NavigationBundle\Navigation\Filter\Matcher\RoutesMatcher;
-use Rybakit\Bundle\NavigationBundle\Navigation\Filter\MatchFilter;
-use Rybakit\Bundle\NavigationBundle\Navigation\Filter\UrlFilter;
-use Rybakit\Bundle\NavigationBundle\Navigation\ItemFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-class Builder 
+class Builder
 {
-    private $container;
-    private $kernel;
 
+    protected $container;
+    protected $kernel;
 
-    function __construct(ContainerInterface $container, KernelInterface $kernel)
+    public function __construct(ContainerInterface $container, KernelInterface $kernel)
     {
         $this->container = $container;
         $this->kernel = $kernel;
     }
 
-
-    public function build($navigation)
+    public function buildFromAlias($alias)
     {
-        $route = $this->container->get('request')->attributes->get('_route');
-        $routeParams = $this->container->get('request')->attributes->get('_route_params', array());
-
-        $filter = new FilterChain(array(
-            new UrlFilter($this->container->get('router')),
-            $matchFilter = new MatchFilter(new RoutesMatcher($route, $routeParams)),
-            new BindFilter(),
-        ));
-
-        $item = new Item();
-        $item->transDomain = 'navigation';
-        $factory = new ItemFactory($filter, $item);
-
-        $classData = explode(':', $navigation);
-
-        if (sizeof($classData) != 2) {
-            list($bundleName, $className, $methodName) = $classData;
-
-            $class = null;
-
-            foreach ($this->kernel->getBundle($bundleName, false) as $bundle) {
-                $try = $bundle->getNamespace().'\\Navigation\\'.$className;
+        $data = explode(':', $alias);
+        $class = null;
+        if (sizeof($data) == 3) {
+            list($classBundle, $classPath, $className) = $data;
+            foreach ($this->kernel->getBundle($classBundle, false) as $bundle) {
+                $try = $this->getNormalizedClassName($bundle->getNamespace(), $classPath, $className);
                 if (class_exists($try)) {
-                    $class = $try;
+                    $class = new $try;
                     break;
                 }
             }
 
-            $builder = new $class;            
-        } else {
-            list($service, $methodName) = $classData;
+            if (!$class) {
+                throw new \Exception('Navigation class not found');
+            }
 
-            $builder = $this->container->get($service);
-            if (!$builder) {
-                throw new \Exception('Service not found');
+        } elseif (sizeof($data) == 1) {
+            $class = $this->container->get($alias);
+            if (!$class) {
+                throw new \Exception('Service ' . $alias . ' not found');
             }
         }
 
-        if (!method_exists($builder, $methodName)) {
-            throw new \Exception('Class not found');
-        }
+        $tree = $class->build();
 
-        $navigationTree = $builder->$methodName();
+        $navigation = new Navigation();
+        $navigation->addPages($tree);
+        $navigation->setRouter($this->container->get('router'), true);
+        $navigation->setRequest($this->container->get('request'), true);
 
-        $root = $factory->create($navigationTree);
-
-        if (!$current = $matchFilter->getMatched()) {
-            $current = $root;
-        }
-        $current->setActive();
-
-        return array('root' => $root, 'current' => $current);
+        return $navigation;
     }
-} 
+
+    protected function getNormalizedClassName($bundleNamespace, $classPath, $className)
+    {
+        return $bundleNamespace . '\\' . $classPath . '\\' . ucfirst($className) . 'Navigation';
+    }
+}
