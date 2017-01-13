@@ -17,11 +17,6 @@ class NavigationExtension extends \Twig_Extension
 
     protected $config;
 
-    /**
-     * @var \Twig_Environment
-     */
-    protected $environment;
-
     public function __construct(Builder $builder, $config)
     {
         $this->builder = $builder;
@@ -33,23 +28,21 @@ class NavigationExtension extends \Twig_Extension
         return 'prime_navigation';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function initRuntime(\Twig_Environment $environment)
-    {
-        $this->environment = $environment;
-    }
-
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('navigation', [$this, 'navigation'], ['is_safe' => ['html']]),
-            new \Twig_SimpleFunction('navigation_breadcrumbs', [$this, 'breadcrumbs'], ['is_safe' => ['html']]),
+            new \Twig_SimpleFunction('navigation', [$this, 'navigation'], [
+                'is_safe' => ['html'],
+                'needs_environment' => true
+            ]),
+            new \Twig_SimpleFunction('navigation_breadcrumbs', [$this, 'breadcrumbs'], [
+                'is_safe' => ['html'],
+                'needs_environment' => true
+            ]),
         );
     }
 
-    public function navigation($alias, $options = null)
+    public function navigation(\Twig_Environment $env, $alias, $options = null)
     {
         $navigation = $this->builder->buildFromAlias($alias);
 
@@ -58,12 +51,12 @@ class NavigationExtension extends \Twig_Extension
             $template = $options['template'];
         }
 
-        return $this->environment->render($template, array(
+        return $env->render($template, array(
             'navigation' => $navigation
         ));
     }
 
-    public function breadcrumbs($alias, $options = null)
+    public function breadcrumbs(\Twig_Environment $env, $alias, $options = null)
     {
         $navigation = $this->builder->buildFromAlias($alias);
         $template = $this->config['breadcrumbs_template'];
@@ -122,7 +115,7 @@ class NavigationExtension extends \Twig_Extension
             }
         }
 
-        return $this->environment->render($template, array(
+        return $env->render($template, array(
             'breadcrumbs' => array_reverse($breadcrumbs)
         ));
     }
