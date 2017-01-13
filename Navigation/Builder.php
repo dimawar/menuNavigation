@@ -52,7 +52,9 @@ class Builder
         $navigation = new Navigation();
         $navigation->addPages($tree);
         $navigation->setRouter($this->container->get('router'), true);
-        $navigation->setRequest($this->container->get('request'), true);
+        $requestStack = $this->container->get('request_stack');
+        $request = $requestStack->getCurrentRequest();
+        $navigation->setRequest($request, true);
 
         return $navigation;
     }
