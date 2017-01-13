@@ -1,10 +1,10 @@
 services:
     prime.navigation_builder:
         class: Prime\NavigationBundle\Navigation\Builder
-        arguments: [@service_container, @kernel]
+        arguments: ["@service_container", "@kernel"]
 
     prime.navigation_extension:
         class: Prime\NavigationBundle\Twig\Extension\NavigationExtension
-        arguments: [@prime.navigation_builder, %prime_navigation%]
+        arguments: ["@prime.navigation_builder", "%prime_navigation%"]
         tags:
             - { name: twig.extension }
