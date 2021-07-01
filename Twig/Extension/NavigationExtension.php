@@ -9,8 +9,11 @@ namespace Prime\NavigationBundle\Twig\Extension;
 
 use Prime\NavigationBundle\Navigation\Builder;
 use Prime\NavigationBundle\Navigation\Page\Page;
+use Twig\Environment;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class NavigationExtension extends \Twig_Extension
+class NavigationExtension extends AbstractExtension
 {
     /** @var Builder */
     protected $builder;
@@ -31,18 +34,18 @@ class NavigationExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('navigation', [$this, 'navigation'], [
+            new TwigFunction('navigation', [$this, 'navigation'], [
                 'is_safe' => ['html'],
                 'needs_environment' => true
             ]),
-            new \Twig_SimpleFunction('navigation_breadcrumbs', [$this, 'breadcrumbs'], [
+            new TwigFunction('navigation_breadcrumbs', [$this, 'breadcrumbs'], [
                 'is_safe' => ['html'],
                 'needs_environment' => true
             ]),
         );
     }
 
-    public function navigation(\Twig_Environment $env, $alias, $options = null)
+    public function navigation(Environment $env, $alias, $options = null)
     {
         $navigation = $this->builder->buildFromAlias($alias);
 
@@ -56,7 +59,7 @@ class NavigationExtension extends \Twig_Extension
         ));
     }
 
-    public function breadcrumbs(\Twig_Environment $env, $alias, $options = null)
+    public function breadcrumbs(Environment $env, $alias, $options = null)
     {
         $navigation = $this->builder->buildFromAlias($alias);
         $template = $this->config['breadcrumbs_template'];
