@@ -5,7 +5,7 @@
 Add PrimeNavigationBundle to your composer.json
 
 ```
-composer require dimawar/mainNavigationBundle
+composer require dimawar/main-navigation-bundle
 ```
 
 ### Create your first navigation
